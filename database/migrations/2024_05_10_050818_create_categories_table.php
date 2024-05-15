@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('categories', function (Blueprint $table) {
             $table->id();
-            $table->unsignedInteger('parent_id')->nullable;
+            $table->unsignedInteger('parent_id')->nullable();
+            //$table->foreignId('parent_id')->constrained();
             $table->string('name');
             $table->timestamps();
         });

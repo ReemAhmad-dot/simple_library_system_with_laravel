@@ -3,47 +3,41 @@
 namespace App\Http\Controllers;
 
 use App\Models\Book;
-use App\Models\Category;
 use App\Models\Review;
+use App\Models\Category;
 use Illuminate\Http\Request;
+use App\Services\BookService;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\StoreBookRequest;
 
 class BookController extends Controller
 {
-    public function __construct(){
+    protected  $bookService;
+
+    public function __construct(BookService $bookService){
+        $this->bookService=$bookService;
         $this->middleware('permission:update role', ['only' => ['rateBook','addToFavorite']]);
     }
     public function index()
     {
         $books=Book::get();
-        return view('admin.index')->with('books',$books);
+        return view('admin.books.index')->with('books',$books);
     }
 
     public function create()
     {   
         $allCategories=Category::where('parent_id','!=',0)->get();
-        return view('admin.create',['allCategories'=>$allCategories]);
+        return view('admin.books.create',['allCategories'=>$allCategories]);
     }
 
-    public function store(Request $request)
+    public function store(StoreBookRequest $request)
     {
-        $request->validate([
-            'title' => ['required','string'],
-            'description' => ['string','nullable'],
-            'price' => ['required','numeric'],
-            'category_id' => ['required'],
-        ]);
+        $validated=$request->safe();
+        $this->bookService->create($validated);
 
-        Book::create([
-            'title' => $request->title,
-            'description' => $request->description,
-            'price' => $request->price,
-            'category_id' => $request->category_id,
-            'user_id'=>Auth::Id()
-        ]);
-
-        return redirect('books')->with('status','Role Created Successfully');
+        return redirect('/books')->with('status','Book Created Successfully');
     }
+
     public function rateBook(Request $request){
         $request->validate([
             'comment' => ['string','nullable'],

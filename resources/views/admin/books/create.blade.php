@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+<x-admin-master>
 
 @section('content')
 <div class="container mt-5">
@@ -54,3 +54,5 @@
     </div>
 </div>
 @endsection
+
+</x-admin-master>
